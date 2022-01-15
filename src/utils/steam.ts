@@ -17,8 +17,9 @@ const sendProcess = async (config: ConfigProps, offer, item: Item, retry: number
     if (retry === 10) {
       message(config, `Create offer ${item.market_name} failed in 10 times. Ignore the trade`, Status.FAILED);
     } else {
-      message(config, `Create offer ${item.market_name} failed. Retry in 10 seconds`, Status.FAILED);
-      await timeout(10000);
+      message(config, `Create offer ${item.market_name} failed. Retry in 1 minute`, Status.FAILED);
+      await loginSteam(config);
+      await timeout(60000);
       return await sendProcess(config, offer, item, retry + 1);
     }
   }
@@ -32,8 +33,9 @@ const confirmProcess = async (config: ConfigProps, steam, offer, item: Item, ret
     if (retry === 10) {
       message(config, `Confirm offer ${item.market_name} failed in 10 times. Ignore the trade`, Status.FAILED);
     } else {
-      message(config, `Confirm offer ${item.market_name} failed. Retry in 10 seconds`, Status.FAILED);
-      await timeout(10000);
+      message(config, `Confirm offer ${item.market_name} failed. Retry in 1 minute`, Status.FAILED);
+      await loginSteam(config);
+      await timeout(60000);
       return await confirmProcess(config, steam, offer, item, retry + 1);
     }
   }

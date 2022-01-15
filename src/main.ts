@@ -1,5 +1,6 @@
 import { USER_CONFIG } from './config/index';
 import { initEmpireSocket } from './empire';
+import { timeout } from './utils';
 import { loginSteam } from './utils/steam';
 
 const main = () => {
@@ -12,6 +13,7 @@ const initUser = async () => {
     if (USER_CONFIG[i].empire.active) {
       initEmpireSocket(USER_CONFIG[i]);
     }
+    await timeout(10000);
   }
 };
 
