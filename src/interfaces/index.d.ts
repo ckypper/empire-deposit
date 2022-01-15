@@ -4,6 +4,7 @@ export interface ConfigProps {
     apikey: string;
     uid: number;
     active: boolean;
+    acceptThreshold?: number;
   };
   steam: Steam;
   discord: {

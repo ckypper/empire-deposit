@@ -49,6 +49,25 @@ const processSentOffer = async (data: TradeDataProps, config: ConfigProps) => {
   await sendOffer(config, data.items[0], trade_url);
 };
 
+const onProcessTrade = (config: ConfigProps, data: TradeDataProps) => {
+  const itemName = data.items[0].market_name;
+  const itemTotalValue = data.total_value;
+  const orgValue = depositItemsManager[data.id].price;
+  const acceptPercent = (config.empire.acceptThreshold || 0) / 100 + 1;
+  const priceAccepted = Math.round(itemTotalValue * acceptPercent);
+  if (priceAccepted >= orgValue) {
+    if (!sendedOffer.includes(data.id)) {
+      processSentOffer(data, config);
+    }
+  } else {
+    message(
+      config,
+      `Ignore sent ${itemName} due to dropped price from ${orgValue} to ${itemTotalValue}`,
+      Status.FAILED,
+    );
+  }
+};
+
 const onEmpireTrade = async (msg: TradeStatusProps, config: ConfigProps) => {
   if (msg.type !== 'deposit') {
     return;
@@ -66,21 +85,9 @@ const onEmpireTrade = async (msg: TradeStatusProps, config: ConfigProps) => {
     return;
   }
 
-  const orgItemPrice = depositItemsManager[msg.data.id].price;
-
   switch (msg.data.status_message) {
     case 'Sending':
-      if (itemTotalValue >= orgItemPrice) {
-        if (!sendedOffer.includes(msg.data.id)) {
-          processSentOffer(msg.data, config);
-        }
-      } else {
-        message(
-          config,
-          `Ignore sent ${itemName} due to dropped price from ${orgItemPrice} to ${itemTotalValue}`,
-          Status.FAILED,
-        );
-      }
+      onProcessTrade(config, msg.data);
       break;
     case 'Completed':
       message(config, `${itemName} has sold for ${itemTotalValue} coins`, Status.SUCCESS);
@@ -119,9 +126,7 @@ const onEmpireInit = async (data: any, config: ConfigProps) => {
         };
 
         if (item.status_message === 'Sending') {
-          if (!sendedOffer.includes(item.id)) {
-            processSentOffer(item, config);
-          }
+          onProcessTrade(config, item);
         }
       });
     }
