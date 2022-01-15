@@ -18,7 +18,7 @@ export const initEmpireSocket = async (config: ConfigProps) => {
     rejectUnauthorized: false,
     reconnect: true,
     extraHeaders: {
-      'User-agent': config.userAgent,
+      'User-agent': `${config.empire.uid} API BOT`,
     },
   });
 
@@ -103,7 +103,6 @@ const onEmpireConnect = async (socket: any, config: ConfigProps) => {
       model: meta.user,
       authorizationToken: meta.socket_token,
       signature: meta.socket_signature,
-      uuid: config.empire.uuid,
     });
   }
 };

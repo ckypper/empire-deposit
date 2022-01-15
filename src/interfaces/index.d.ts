@@ -1,10 +1,8 @@
 export interface ConfigProps {
   name: string;
-  userAgent: string;
   empire: {
     apikey: string;
     uid: number;
-    uuid: string;
     active: boolean;
   };
   steam: Steam;

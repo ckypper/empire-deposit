@@ -6,7 +6,6 @@ import { ConfigProps } from '../interfaces';
 export const getHeaders = (config: ConfigProps) => {
   return {
     headers: {
-      'user-agent': config.userAgent,
       Authorization: `Bearer ${config.empire.apikey}`,
     },
   };
