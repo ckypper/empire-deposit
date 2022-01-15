@@ -1,1 +1,2 @@
-yarn start
+npm run start
+pause
