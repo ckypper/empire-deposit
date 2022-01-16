@@ -16,7 +16,7 @@ const sendProcess = async (config: ConfigProps, item: Item, tradeUrl: string, re
   try {
     await send(offer);
     message(config, `Create offer ${item.market_name} successfully`, Status.SUCCESS);
-    return true;
+    return offer;
   } catch (error) {
     if (retry === 10) {
       message(config, `Create offer ${item.market_name} failed in 10 times. Ignore the trade`, Status.FAILED);
