@@ -1,14 +1,18 @@
 import { ConfigProps } from '../interfaces';
-import { Item } from '../interfaces/empire';
 import SteamCommunity from 'steamcommunity';
 import TradeOfferManager from 'steam-tradeoffer-manager';
 import SteamTotp from 'steam-totp';
 import { message, Status } from './message';
 import { timeout } from '.';
+import { Item } from '../interfaces/empire';
 
 const steamManager = {};
 
-const sendProcess = async (config: ConfigProps, offer, item: Item, retry: number) => {
+const sendProcess = async (config: ConfigProps, item: Item, tradeUrl: string, retry: number) => {
+  const items = [{ assetid: item.asset_id, appid: item.app_id, contextid: item.context_id }];
+  const manager = steamManager[config.steam.accountName].manager;
+  const offer = manager.createOffer(tradeUrl);
+  offer.addMyItems(items);
   try {
     await send(offer);
     message(config, `Create offer ${item.market_name} successfully`, Status.SUCCESS);
@@ -20,13 +24,14 @@ const sendProcess = async (config: ConfigProps, offer, item: Item, retry: number
       message(config, `Create offer ${item.market_name} failed. Retry in 1 minute`, Status.FAILED);
       await loginSteam(config);
       await timeout(60000);
-      return await sendProcess(config, offer, item, retry + 1);
+      return await sendProcess(config, item, tradeUrl, retry + 1);
     }
   }
 };
 
-const confirmProcess = async (config: ConfigProps, steam, offer, item: Item, retry: number) => {
+const confirmProcess = async (config: ConfigProps, offer, item: Item, retry: number) => {
   try {
+    const steam = steamManager[config.steam.accountName].steam;
     await confirm(offer, config.steam.identitySecret, steam);
     message(config, `Confirm offer ${item.market_name} successfully`, Status.SUCCESS);
   } catch (error) {
@@ -36,22 +41,16 @@ const confirmProcess = async (config: ConfigProps, steam, offer, item: Item, ret
       message(config, `Confirm offer ${item.market_name} failed. Retry in 1 minute`, Status.FAILED);
       await loginSteam(config);
       await timeout(60000);
-      return await confirmProcess(config, steam, offer, item, retry + 1);
+      return await confirmProcess(config, offer, item, retry + 1);
     }
   }
 };
 
 export const sendOffer = async (config: ConfigProps, item: Item, tradeurl: string) => {
-  const items = [{ assetid: item.asset_id, appid: item.app_id, contextid: item.context_id }];
-  const manager = steamManager[config.steam.accountName].manager;
-  if (manager) {
-    const offer = manager.createOffer(tradeurl);
-    offer.addMyItems(items);
-    const success = await sendProcess(config, offer, item, 1);
-    if (success) {
-      await timeout(10000);
-      await confirmProcess(config, steamManager[config.steam.accountName].steam, offer, item, 1);
-    }
+  const offer = await sendProcess(config, item, tradeurl, 1);
+  if (offer) {
+    await timeout(10000);
+    await confirmProcess(config, offer, item, 1);
   }
 };
 
