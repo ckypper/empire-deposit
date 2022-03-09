@@ -35,6 +35,7 @@ const confirmProcess = async (config: ConfigProps, offer, item: Item, retry: num
     await confirm(offer, config.steam.identitySecret, steam);
     message(config, `Confirm offer ${item.market_name} successfully`, Status.SUCCESS);
   } catch (error) {
+    console.log(error, error.response);
     if (retry === 10) {
       message(config, `Confirm offer ${item.market_name} failed in 10 times. Ignore the trade`, Status.FAILED);
     } else {

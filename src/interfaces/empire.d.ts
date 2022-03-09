@@ -5,7 +5,6 @@ interface Metadata {
   auction_number_of_bids: number;
   auction_ends_at: number;
   item_inspected: boolean;
-  profile: Profile;
   timestamp: number;
   trade_url?: string;
 }
@@ -70,7 +69,6 @@ interface User {
   total_tips_sent: number;
   withdrawal_fee_owed: string;
   flags: number;
-  sessions: Session[];
   ban?: any;
   level: number;
   xp: number;
@@ -78,7 +76,6 @@ interface User {
   user_hash: string;
   hashed_server_seed: string;
   intercom_hash: string;
-  roles: Role[];
   extra_security_type: string;
   total_bet_skincrash: number;
   total_bet_matchbetting: number;
@@ -91,7 +88,6 @@ interface User {
   verified: boolean;
   hide_verified_icon: boolean;
   unread_notifications: any[];
-  last_session: LastSession;
   email: string;
   email_verified: boolean;
   btc_deposit_address: string;
@@ -122,6 +118,7 @@ export interface TradeDataProps {
 }
 
 interface Item {
+  id: number;
   app_id: number;
   asset_id: string;
   context_id: string;

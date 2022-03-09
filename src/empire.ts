@@ -1,5 +1,5 @@
-import { TradeDataProps, TradeStatusProps } from './interfaces/empire';
-import { getMetadata, getCurrentDeposits } from './utils/empire';
+import { Item, TradeDataProps, TradeStatusProps } from './interfaces/empire';
+import { getMetadata, getCurrentDeposits, delistItem } from './utils/empire';
 import { message, Status } from './utils/message';
 import io from 'socket.io-client';
 import { ConfigProps } from './interfaces';
@@ -30,6 +30,8 @@ export const initEmpireSocket = async (config: ConfigProps) => {
 
   socket.on('trade_status', (msg: TradeStatusProps) => onEmpireTrade(msg, config));
 
+  socket.on('updated_item', (msg: Item) => onEmpireUpdate(msg, config));
+
   socket.on('error', async (err: any) => {
     message(config, `Cannot connect to empire due to ${err.message}`, Status.FAILED);
   });
@@ -37,6 +39,15 @@ export const initEmpireSocket = async (config: ConfigProps) => {
   setInterval(() => {
     socket.emit('timesync');
   }, 30000);
+};
+
+const onEmpireUpdate = async (msg: Item, config: ConfigProps) => {
+  const orgValue = depositItemsManager[msg.id].price;
+  const acceptPercent = (config.empire.acceptThreshold || 0) / 100 + 1;
+  const priceAccepted = Math.round(msg.market_value * acceptPercent);
+  if (priceAccepted < orgValue) {
+    await delistItem(config, msg, orgValue);
+  }
 };
 
 const processSentOffer = async (data: TradeDataProps, config: ConfigProps) => {

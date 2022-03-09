@@ -1,4 +1,4 @@
-import { DepositResponseProps, MetadataResponseProps } from '../interfaces/empire';
+import { DepositResponseProps, Item, MetadataResponseProps } from '../interfaces/empire';
 import axios from 'axios';
 import { message, Status } from './message';
 import { ConfigProps } from '../interfaces';
@@ -30,6 +30,23 @@ export const getCurrentDeposits = async (config: ConfigProps) => {
     return response.data.deposits;
   } catch (error) {
     message(config, `Cannot get current deposit due to "${error.message}"`, Status.FAILED);
+    return null;
+  }
+};
+
+export const delistItem = async (config: ConfigProps, item: Item, orgValue: number) => {
+  try {
+    message(
+      config,
+      `Try to delist item ${item.market_name} cause price drop from ${orgValue} to ${item.market_value}`,
+      Status.SUCCESS,
+    );
+    const url = `https://csgoempire.com/api/v2/trading/deposit/${item.id}/cancel`;
+    await axios.post(url, getHeaders(config));
+    message(config, `Delist item ${item.market_name} successfully`, Status.SUCCESS);
+    return true;
+  } catch (error) {
+    message(config, `Delist item ${item.market_name} failed due to "${error.message}"`, Status.FAILED);
     return null;
   }
 };
