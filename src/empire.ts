@@ -42,11 +42,14 @@ export const initEmpireSocket = async (config: ConfigProps) => {
 };
 
 const onEmpireUpdate = async (msg: Item, config: ConfigProps) => {
-  const orgValue = depositItemsManager[msg.id].price;
-  const acceptPercent = (config.empire.acceptThreshold || 0) / 100 + 1;
-  const priceAccepted = Math.round(msg.market_value * acceptPercent);
-  if (priceAccepted < orgValue) {
-    await delistItem(config, msg, orgValue);
+  const depositItem = depositItemsManager[msg.id.toString()];
+  if (depositItem) {
+    const orgValue = depositItem.price;
+    const acceptPercent = (config.empire.acceptThreshold || 0) / 100 + 1;
+    const priceAccepted = Math.round(msg.market_value * acceptPercent);
+    if (priceAccepted < orgValue) {
+      await delistItem(config, msg, orgValue);
+    }
   }
 };
 
