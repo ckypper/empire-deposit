@@ -11,6 +11,9 @@ export interface ConfigProps {
     active: boolean;
     hook: string;
   };
+  hwang: {
+    apikey: string;
+  };
 }
 
 interface Steam {

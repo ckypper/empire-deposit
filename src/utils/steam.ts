@@ -7,6 +7,8 @@ import { timeout } from '.';
 import { Item } from '../interfaces/empire';
 
 const steamManager = {};
+const retryAttempt = 5;
+const retryDelay = 2;
 
 const sendProcess = async (config: ConfigProps, item: Item, tradeUrl: string, retry: number) => {
   const items = [{ assetid: item.asset_id, appid: item.app_id, contextid: item.context_id }];
@@ -18,12 +20,16 @@ const sendProcess = async (config: ConfigProps, item: Item, tradeUrl: string, re
     message(config, `Create offer ${item.market_name} successfully`, Status.SUCCESS);
     return offer;
   } catch (error) {
-    if (retry === 10) {
-      message(config, `Create offer ${item.market_name} failed in 10 times. Ignore the trade`, Status.FAILED);
+    if (retry === retryAttempt) {
+      message(
+        config,
+        `Create offer ${item.market_name} failed in ${retryAttempt} times. Ignore the trade`,
+        Status.FAILED,
+      );
     } else {
-      message(config, `Create offer ${item.market_name} failed. Retry in 1 minute`, Status.FAILED);
+      message(config, `Create offer ${item.market_name} failed. Retry in ${retryDelay} minute`, Status.FAILED);
       await loginSteam(config);
-      await timeout(60000);
+      await timeout(60000 * retryDelay);
       return await sendProcess(config, item, tradeUrl, retry + 1);
     }
   }
@@ -35,13 +41,16 @@ const confirmProcess = async (config: ConfigProps, offer, item: Item, retry: num
     await confirm(offer, config.steam.identitySecret, steam);
     message(config, `Confirm offer ${item.market_name} successfully`, Status.SUCCESS);
   } catch (error) {
-    console.log(error, error.response);
-    if (retry === 10) {
-      message(config, `Confirm offer ${item.market_name} failed in 10 times. Ignore the trade`, Status.FAILED);
+    if (retry === retryAttempt) {
+      message(
+        config,
+        `Confirm offer ${item.market_name} failed in ${retryAttempt} times. Ignore the trade`,
+        Status.FAILED,
+      );
     } else {
-      message(config, `Confirm offer ${item.market_name} failed. Retry in 1 minute`, Status.FAILED);
+      message(config, `Confirm offer ${item.market_name} failed. Retry in ${retryDelay} minute`, Status.FAILED);
       await loginSteam(config);
-      await timeout(60000);
+      await timeout(60000 * retryDelay);
       return await confirmProcess(config, offer, item, retry + 1);
     }
   }

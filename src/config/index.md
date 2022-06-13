@@ -4,6 +4,9 @@ import { ConfigProps } from '../interfaces/index';
 export const USER_CONFIG: ConfigProps[] = [
   {
     name: 'John', // To display in message
+    hwang: {
+      apikey: 'abcxyz',
+    },
     empire: {
       active: true, // if true, empire deposit will active
       uid: 123456, // CSGOEmpire ID, you can find in API metadata in empire,

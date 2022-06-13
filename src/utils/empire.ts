@@ -50,3 +50,25 @@ export const delistItem = async (config: ConfigProps, item: Item, orgValue: numb
     return null;
   }
 };
+
+export const noteHwangTrade = async (config: ConfigProps, assetId: string, price: number) => {
+  try {
+    const url = `https://hwang-trade.vercel.app/api/item-trading/sell`;
+    await axios.post(
+      url,
+      {
+        asset_id: assetId,
+        sold_price: price,
+        sold_site: 'csgoempire',
+      },
+      {
+        headers: {
+          'x-api-key': config.hwang.apikey,
+        },
+      },
+    );
+    return true;
+  } catch (error) {
+    return null;
+  }
+};

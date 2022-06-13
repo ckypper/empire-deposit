@@ -1,5 +1,5 @@
 import { Item, TradeDataProps, TradeStatusProps } from './interfaces/empire';
-import { getMetadata, getCurrentDeposits, delistItem } from './utils/empire';
+import { getMetadata, getCurrentDeposits, delistItem, noteHwangTrade } from './utils/empire';
 import { message, Status } from './utils/message';
 import io from 'socket.io-client';
 import { ConfigProps } from './interfaces';
@@ -104,6 +104,7 @@ const onEmpireTrade = async (msg: TradeStatusProps, config: ConfigProps) => {
       onProcessTrade(config, msg.data);
       break;
     case 'Completed':
+      noteHwangTrade(config, msg.data.items[0].asset_id, itemTotalValue / 100);
       message(config, `${itemName} has sold for ${itemTotalValue} coins`, Status.SUCCESS);
       break;
     case 'Timeout':
