@@ -67,8 +67,10 @@ export const noteHwangTrade = async (config: ConfigProps, assetId: string, price
         },
       },
     );
+    message(config, `Note sold item successfully`, Status.SUCCESS);
     return true;
   } catch (error) {
+    message(config, `Note sold item failed due to ${error.message}`, Status.FAILED);
     return null;
   }
 };
