@@ -95,7 +95,6 @@ const onEmpireTrade = async (msg: TradeStatusProps, config: ConfigProps) => {
       name: itemName,
       price: itemTotalValue,
     };
-    message(config, `${itemName} has been listed for ${itemTotalValue} coins`, Status.SUCCESS);
     return;
   }
 
