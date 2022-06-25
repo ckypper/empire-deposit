@@ -24,8 +24,10 @@ export const message = (config: ConfigProps, message: string, status: Status) =>
   }
 
   if (config.discord.active) {
-    axios.post(config.discord.hook, {
-      content: `${formatMessage}`,
-    });
+    try {
+      axios.post(config.discord.hook, {
+        content: `${formatMessage}`,
+      });
+    } catch (error) {}
   }
 };
